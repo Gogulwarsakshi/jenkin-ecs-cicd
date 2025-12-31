@@ -4,8 +4,13 @@ pipeline {
     environment {
         AWS_REGION = "ap-south-1"
         AWS_ACCOUNT_ID = "479929096401"
-        ECR_REPO = "react-app"
+
+        IMAGE_NAME = "react-app"
+        ECR_REPO  = "react-app"
         IMAGE_TAG = "${BUILD_NUMBER}"
+
+        ECR_URI = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+
         CLUSTER_NAME = "react-cluster"
         SERVICE_NAME = "react-service"
     }
@@ -40,18 +45,20 @@ pipeline {
         stage('Docker Build') {
             steps {
                 sh '''
-                  docker build -t $ECR_REPO:$IMAGE_TAG .
+                  docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
                 '''
             }
         }
 
         stage('Login to ECR') {
             steps {
-                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-creds']]) {
+                withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding',
+                    credentialsId: 'aws-creds'
+                ]]) {
                     sh '''
-                      aws ecr get-login-password --region $AWS_REGION | \
-                      docker login --username AWS --password-stdin \
-                      $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+                      aws ecr get-login-password --region ${AWS_REGION} | \
+                      docker login --username AWS --password-stdin ${ECR_URI}
                     '''
                 }
             }
@@ -60,11 +67,14 @@ pipeline {
         stage('Push Image to ECR') {
             steps {
                 sh '''
-                  docker tag $ECR_REPO:$IMAGE_TAG \
-                  $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO:$IMAGE_TAG
+                  docker tag ${IMAGE_NAME}:${IMAGE_TAG} \
+                  ${ECR_URI}/${ECR_REPO}:${IMAGE_TAG}
 
-                  docker push \
-                  $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO:$IMAGE_TAG
+                  docker tag ${IMAGE_NAME}:${IMAGE_TAG} \
+                  ${ECR_URI}/${ECR_REPO}:latest
+
+                  docker push ${ECR_URI}/${ECR_REPO}:${IMAGE_TAG}
+                  docker push ${ECR_URI}/${ECR_REPO}:latest
                 '''
             }
         }
@@ -79,9 +89,10 @@ pipeline {
             steps {
                 sh '''
                   aws ecs update-service \
-                  --cluster $CLUSTER_NAME \
-                  --service $SERVICE_NAME \
-                  --force-new-deployment
+                  --cluster ${CLUSTER_NAME} \
+                  --service ${SERVICE_NAME} \
+                  --force-new-deployment \
+                  --region ${AWS_REGION}
                 '''
             }
         }
