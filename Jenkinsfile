@@ -31,6 +31,7 @@ pipeline {
                 sh '''
                   npm test -- --watch=false || true
                 '''
+
             }
         }
 
