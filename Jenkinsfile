@@ -2,13 +2,12 @@ pipeline {
     agent any
 
    environment {
-    AWS_REGION = "ap-south-2"
+    AWS_REGION     = "ap-south-2"
     AWS_ACCOUNT_ID = "479929096401"
-    IMAGE_NAME = "react-app"
-    IMAGE_TAG = "latest"
-    CLUSTER_NAME = "react-cluster"
-    SERVICE_NAME = "react-service"
+    IMAGE_NAME     = "react-app"
+    ECR_URI        = "479929096401.dkr.ecr.ap-south-2.amazonaws.com/react-app"
 }
+
 
     stages {
 
@@ -62,19 +61,14 @@ pipeline {
 
 
         stage('Push Image to ECR') {
-            steps {
-                sh '''
-                  docker tag ${IMAGE_NAME}:${IMAGE_TAG} \
-                  ${ECR_URI}/${ECR_REPO}:${IMAGE_TAG}
+    steps {
+        sh '''
+          docker tag ${IMAGE_NAME}:latest ${ECR_URI}:latest
+          docker push ${ECR_URI}:latest
+        '''
+    }
+}
 
-                  docker tag ${IMAGE_NAME}:${IMAGE_TAG} \
-                  ${ECR_URI}/${ECR_REPO}:latest
-
-                  docker push ${ECR_URI}/${ECR_REPO}:${IMAGE_TAG}
-                  docker push ${ECR_URI}/${ECR_REPO}:latest
-                '''
-            }
-        }
 
         stage('Approval for Production') {
             steps {
