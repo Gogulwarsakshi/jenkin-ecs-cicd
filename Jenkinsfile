@@ -2,15 +2,10 @@ pipeline {
     agent any
 
    environment {
-    AWS_REGION     = "ap-southeast-2"
-    AWS_ACCOUNT_ID = "479929096401"
-    IMAGE_NAME     = "react-app"
-    IMAGE_TAG      = "latest"
-    ECR_URI        = "479929096401.dkr.ecr.ap-south-2.amazonaws.com/react-app"
+    AWS_REGION  = "ap-southeast-2"
+    ECS_CLUSTER = "react-cluster"
+    ECS_SERVICE = "react-task-service-hizlx1m9"
 }
-
-
-
     stages {
 
         stage('Build') {
@@ -80,15 +75,13 @@ pipeline {
         }
 
         stage('Deploy to ECS') {
-            steps {
-                sh '''
-                  aws ecs update-service \
-                  --cluster ${CLUSTER_NAME} \
-                  --service ${SERVICE_NAME} \
-                  --force-new-deployment \
-                  --region ${AWS_REGION}
-                '''
-            }
-        }
+    steps {
+        sh """
+        aws ecs update-service \
+          --cluster ${ECS_CLUSTER} \
+          --service ${ECS_SERVICE} \
+          --force-new-deployment \
+          --region ${AWS_REGION}
+        """
     }
 }
