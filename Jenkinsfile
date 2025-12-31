@@ -12,14 +12,6 @@ pipeline {
 
     stages {
 
-        stage('Checkout Code') {
-            steps {
-                git branch: 'main',
-                    credentialsId: 'github-ssh',
-                    url: 'git@github.com:Gogulwarsakshi/jenkin-ecs-cicd.git'
-            }
-        }
-
         stage('Build') {
             steps {
                 sh '''
@@ -92,15 +84,6 @@ pipeline {
                   --force-new-deployment
                 '''
             }
-        }
-    }
-
-    post {
-        success {
-            echo '✅ Pipeline completed successfully'
-        }
-        failure {
-            echo '❌ Pipeline failed'
         }
     }
 }
