@@ -5,8 +5,10 @@ pipeline {
     AWS_REGION     = "ap-south-2"
     AWS_ACCOUNT_ID = "479929096401"
     IMAGE_NAME     = "react-app"
+    IMAGE_TAG      = "latest"
     ECR_URI        = "479929096401.dkr.ecr.ap-south-2.amazonaws.com/react-app"
 }
+
 
 
     stages {
@@ -38,12 +40,13 @@ pipeline {
         }
 
         stage('Docker Build') {
-            steps {
-                sh '''
-                  docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
-                '''
-            }
-        }
+    steps {
+        sh '''
+          docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
+        '''
+    }
+}
+
 
        stage('Login to ECR') {
     steps {
@@ -60,11 +63,11 @@ pipeline {
 }
 
 
-        stage('Push Image to ECR') {
+       stage('Push Image to ECR') {
     steps {
         sh '''
-          docker tag ${IMAGE_NAME}:latest ${ECR_URI}:latest
-          docker push ${ECR_URI}:latest
+          docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${ECR_URI}:${IMAGE_TAG}
+          docker push ${ECR_URI}:${IMAGE_TAG}
         '''
     }
 }
