@@ -2,7 +2,7 @@ pipeline {
     agent any
 
    environment {
-    AWS_REGION     = "ap-south-2"
+    AWS_REGION     = "ap-southeast-2"
     AWS_ACCOUNT_ID = "479929096401"
     IMAGE_NAME     = "react-app"
     IMAGE_TAG      = "latest"
