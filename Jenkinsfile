@@ -1,19 +1,14 @@
 pipeline {
     agent any
 
-    environment {
-        AWS_REGION = "ap-southeast-2"
-        AWS_ACCOUNT_ID = "479929096401"
-
-        IMAGE_NAME = "react-app"
-        ECR_REPO  = "react-app"
-        IMAGE_TAG = "${BUILD_NUMBER}"
-
-        ECR_URI = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
-
-        CLUSTER_NAME = "react-cluster"
-        SERVICE_NAME = "react-service"
-    }
+   environment {
+    AWS_REGION = "ap-south-2"
+    AWS_ACCOUNT_ID = "479929096401"
+    IMAGE_NAME = "react-app"
+    IMAGE_TAG = "latest"
+    CLUSTER_NAME = "react-cluster"
+    SERVICE_NAME = "react-service"
+}
 
     stages {
 
